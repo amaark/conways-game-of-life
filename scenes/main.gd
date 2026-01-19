@@ -4,11 +4,11 @@ extends Node2D
 @onready var grid: TileMapLayer = $Grid
 
 var live_cells: Dictionary[Vector2i, int] = {
-	Vector2i(1, 3): 0,
-	Vector2i(2, 3): 0,
-	Vector2i(3, 3): 0,
-	Vector2i(3, 2): 0,
-	Vector2i(2, 1): 0
+	Vector2i(18, 10): 0,
+	Vector2i(19, 10): 0,
+	Vector2i(20, 10): 0,
+	Vector2i(20, 9): 0,
+	Vector2i(19, 8): 0
 	}
 
 var neighbours := [
@@ -22,8 +22,6 @@ var neighbours := [
 	Vector2i(1, 1),
 	]
 
-var paused: bool = true
-
 var prev_mouse_pos
 
 var painting_mode: bool
@@ -32,8 +30,6 @@ func _ready() -> void:
 	for coords in live_cells:
 		grid.set_cell_state(coords, true)
 	
-	evolution_timer.start()
-
 func _process(delta: float) -> void:
 	click()
 
@@ -60,16 +56,13 @@ func click() -> void:
 		prev_mouse_pos = null
 
 func _on_evolution_timer_timeout() -> void:
-	if not paused:
-		evolve()
+	evolve()
 
 func _on_hud_play() -> void:
 	evolution_timer.start()
-	paused = false
 
 func _on_hud_pause() -> void:
 	evolution_timer.stop()
-	paused = true
 
 ## Flips live cells and their neighbours according to the game rules
 func evolve() -> void:
@@ -78,8 +71,11 @@ func evolve() -> void:
 	var to_die: Array[Vector2i] = []
 	var neighbour_coords: Vector2i
 	
-	# Increment the number of neighbours for each neighbour of each live cell
+	# Increment the number of neighbours for each live cell's neighbours
 	for cell in live_cells:
+		# Make sure that solitary cells still get added to num_neighbours
+		if cell not in num_neighbours:
+			num_neighbours[cell] = 0
 		for n in neighbours:
 			neighbour_coords = Vector2i(cell.x + n.x, cell.y + n.y)
 			if neighbour_coords in num_neighbours:
@@ -89,7 +85,7 @@ func evolve() -> void:
 	
 	# Check each live cell and adjacent cell against the 4 cell rules
 	for coords in num_neighbours:
-		if num_neighbours[coords] < 2 or num_neighbours[coords] > 3 and coords in live_cells:
+		if (num_neighbours[coords] < 2 or num_neighbours[coords] > 3) and coords in live_cells:
 			to_die.append(coords)
 		elif num_neighbours[coords] == 3 and not coords in live_cells:
 			to_live.append(coords)
