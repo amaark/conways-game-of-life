@@ -46,9 +46,9 @@ func click_and_drag():
 		drag_start_camera_pos = position
 		dragging = true
 	
-	elif dragging and Input.is_action_just_released("camera_pan"):
-		dragging = false
-	
 	elif dragging:
-		var move_vector := get_viewport().get_mouse_position() - drag_start_mouse_pos
-		position = drag_start_camera_pos - move_vector * (1/zoom.x)
+		if Input.is_action_just_released("camera_pan"):
+			dragging = false
+		else:
+			var move_vector := get_viewport().get_mouse_position() - drag_start_mouse_pos
+			position = drag_start_camera_pos - move_vector * (1/zoom.x)

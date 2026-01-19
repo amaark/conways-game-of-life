@@ -21,8 +21,8 @@ func _process(delta: float) -> void:
 	#print("index:", cursor_index)
 	#print("vectorised index:", index_to_vector(cursor_index))
 
-func set_cell_state(coords: Vector2i, alive: bool) -> void:
-	set_cell(coords, 1 if alive else 0, Vector2(0, 0), 0)
+func set_cell_state(coords: Vector2i, new_state: bool) -> void:
+	set_cell(coords, 1 if new_state else 0, Vector2(0, 0), 0)
 
 #func flip_cell(index: int) -> void:
 	#var state = 0 if cells[index] == true else 1
