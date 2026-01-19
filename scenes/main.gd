@@ -3,8 +3,6 @@ extends Node2D
 @onready var evolution_timer: Timer = $EvolutionTimer
 @onready var grid: TileMapLayer = $Grid
 
-var paused: bool = true
-
 var live_cells: Dictionary[Vector2i, int] = {
 	Vector2i(1, 3): 0,
 	Vector2i(2, 3): 0,
@@ -24,6 +22,12 @@ var neighbours := [
 	Vector2i(1, 1),
 	]
 
+var paused: bool = true
+
+var prev_mouse_pos
+
+var painting_mode: bool
+
 func _ready() -> void:
 	for coords in live_cells:
 		grid.set_cell_state(coords, true)
@@ -34,15 +38,26 @@ func _process(delta: float) -> void:
 	click()
 
 func click() -> void:
-	if paused and Input.is_action_just_pressed("paint_tile"):
+	if Input.is_action_just_pressed("paint_cell"):
+		painting_mode = not grid.local_to_map(get_global_mouse_position()) in live_cells
+	
+	if Input.is_action_pressed("paint_cell"):
 		var coords := grid.local_to_map(get_global_mouse_position())
-		var new_state := not coords in live_cells
-		grid.set_cell_state(coords, new_state)
 		
-		if new_state:
+		# Debounce
+		if coords == prev_mouse_pos:
+			return
+		
+		prev_mouse_pos = coords
+		grid.set_cell_state(coords, painting_mode)
+		
+		if painting_mode:
 			live_cells[coords] = 0
 		else:
 			live_cells.erase(coords)
+	
+	if Input.is_action_just_released("paint_cell"):
+		prev_mouse_pos = null
 
 func _on_evolution_timer_timeout() -> void:
 	if not paused:
