@@ -20,8 +20,12 @@ func _process(delta: float) -> void:
 func zoom_camera(delta: float):
 	if Input.is_action_just_pressed("camera_zoom_in"):
 		zoom_target *= 1.1
+		if zoom_target > Vector2(2.5, 2.5):
+			zoom_target = Vector2(2.5, 2.5)
 	if Input.is_action_just_pressed("camera_zoom_out"):
 		zoom_target *= 0.9
+		if zoom_target < Vector2(0.05, 0.05):
+			zoom_target = Vector2(0.05, 0.05)
 		
 	zoom = zoom.slerp(zoom_target, zoom_speed * delta)
 
