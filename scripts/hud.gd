@@ -3,7 +3,7 @@ extends CanvasLayer
 signal play
 signal pause
 
-@onready var texture_button: TextureButton = $TextureButton
+@onready var play_button: TextureButton = $PlayButton
 
 var paused := true
 
@@ -16,10 +16,10 @@ func _on_texture_button_pressed() -> void:
 	if paused:
 		play.emit()
 		paused = false
-		texture_button.texture_normal = pause_texture_normal
-		texture_button.texture_pressed = pause_texture_pressed
+		play_button.texture_normal = pause_texture_normal
+		play_button.texture_pressed = pause_texture_pressed
 	else:
 		pause.emit()
 		paused = true
-		texture_button.texture_normal = play_texture_normal
-		texture_button.texture_pressed = play_texture_pressed
+		play_button.texture_normal = play_texture_normal
+		play_button.texture_pressed = play_texture_pressed

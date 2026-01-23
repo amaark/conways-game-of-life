@@ -30,30 +30,29 @@ func _ready() -> void:
 	for coords in live_cells:
 		grid.set_cell_state(coords, true)
 	
-func _process(delta: float) -> void:
-	click()
+func _unhandled_input(event: InputEvent) -> void:
+	if Input.is_action_pressed("paint_cell"):
+		click()
+	if Input.is_action_just_released("paint_cell"):
+		prev_mouse_pos = null
 
 func click() -> void:
 	if Input.is_action_just_pressed("paint_cell"):
 		painting_mode = not grid.local_to_map(get_global_mouse_position()) in live_cells
+		
+	var coords := grid.local_to_map(get_global_mouse_position())
 	
-	if Input.is_action_pressed("paint_cell"):
-		var coords := grid.local_to_map(get_global_mouse_position())
-		
-		# Debounce
-		if coords == prev_mouse_pos:
-			return
-		
-		prev_mouse_pos = coords
-		grid.set_cell_state(coords, painting_mode)
-		
-		if painting_mode:
-			live_cells[coords] = 0
-		else:
-			live_cells.erase(coords)
+	# Debounce
+	if coords == prev_mouse_pos:
+		return
 	
-	if Input.is_action_just_released("paint_cell"):
-		prev_mouse_pos = null
+	prev_mouse_pos = coords
+	grid.set_cell_state(coords, painting_mode)
+	
+	if painting_mode:
+		live_cells[coords] = 0
+	else:
+		live_cells.erase(coords)
 
 func _on_evolution_timer_timeout() -> void:
 	evolve()
@@ -76,6 +75,7 @@ func evolve() -> void:
 		# Make sure that solitary cells still get added to num_neighbours
 		if cell not in num_neighbours:
 			num_neighbours[cell] = 0
+			
 		for n in neighbours:
 			neighbour_coords = Vector2i(cell.x + n.x, cell.y + n.y)
 			if neighbour_coords in num_neighbours:
