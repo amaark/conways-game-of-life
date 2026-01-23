@@ -97,3 +97,6 @@ func evolve() -> void:
 	for coords in to_die:
 		grid.set_cell_state(coords, false)
 		live_cells.erase(coords)
+
+func _on_hud_change_speed(new_value: float) -> void:
+	evolution_timer.wait_time = 0.1 / new_value

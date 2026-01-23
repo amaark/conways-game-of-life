@@ -75,5 +75,6 @@ wait_time = 0.1
 [node name="HUD" parent="." instance=ExtResource("7_o6xl0")]
 
 [connection signal="timeout" from="EvolutionTimer" to="." method="_on_evolution_timer_timeout"]
+[connection signal="change_speed" from="HUD" to="." method="_on_hud_change_speed"]
 [connection signal="pause" from="HUD" to="." method="_on_hud_pause"]
 [connection signal="play" from="HUD" to="." method="_on_hud_play"]
