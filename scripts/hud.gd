@@ -3,6 +3,7 @@ extends CanvasLayer
 signal play
 signal pause
 signal change_speed(new_value: float)
+signal clear
 
 @onready var play_button: TextureButton = $PlayButton
 
@@ -27,3 +28,6 @@ func _on_play_button_pressed() -> void:
 
 func _on_speed_slider_value_changed(value: float) -> void:
 	change_speed.emit(value)
+
+func _on_clear_button_pressed() -> void:
+	clear.emit()

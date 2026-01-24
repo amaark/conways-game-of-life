@@ -41,11 +41,10 @@ func click() -> void:
 		painting_mode = not grid.local_to_map(get_global_mouse_position()) in live_cells
 		
 	var coords := grid.local_to_map(get_global_mouse_position())
-	
 	# Debounce
 	if coords == prev_mouse_pos:
 		return
-	
+		
 	prev_mouse_pos = coords
 	grid.set_cell_state(coords, painting_mode)
 	
@@ -75,7 +74,6 @@ func evolve() -> void:
 		# Make sure that solitary cells still get added to num_neighbours
 		if cell not in num_neighbours:
 			num_neighbours[cell] = 0
-			
 		for n in neighbours:
 			neighbour_coords = Vector2i(cell.x + n.x, cell.y + n.y)
 			if neighbour_coords in num_neighbours:
@@ -100,3 +98,8 @@ func evolve() -> void:
 
 func _on_hud_change_speed(new_value: float) -> void:
 	evolution_timer.wait_time = 0.1 / new_value
+
+func _on_hud_clear() -> void:
+	for cell in live_cells:
+		grid.set_cell_state(cell, false)
+	live_cells.clear()
