@@ -14,20 +14,27 @@ var play_texture_pressed = preload("res://assets/play_button_pressed.png")
 var pause_texture_normal = preload("res://assets/pause_button_normal.png")
 var pause_texture_pressed = preload("res://assets/pause_button_pressed.png")
 
+func play_game() -> void:
+	play.emit()
+	paused = false
+	play_button.texture_normal = pause_texture_normal
+	play_button.texture_pressed = pause_texture_pressed
+	
+func pause_game() -> void:
+	pause.emit()
+	paused = true
+	play_button.texture_normal = play_texture_normal
+	play_button.texture_pressed = play_texture_pressed
+
 func _on_play_button_pressed() -> void:
 	if paused:
-		play.emit()
-		paused = false
-		play_button.texture_normal = pause_texture_normal
-		play_button.texture_pressed = pause_texture_pressed
+		play_game()
 	else:
-		pause.emit()
-		paused = true
-		play_button.texture_normal = play_texture_normal
-		play_button.texture_pressed = play_texture_pressed
+		pause_game()
 
 func _on_speed_slider_value_changed(value: float) -> void:
 	change_speed.emit(value)
 
 func _on_clear_button_pressed() -> void:
 	clear.emit()
+	pause_game()
