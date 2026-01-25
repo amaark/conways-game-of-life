@@ -69,12 +69,8 @@ scale = Vector2(-10.493293, -23.73837)
 zoom = Vector2(0.5, 0.5)
 script = ExtResource("7_tipki")
 
-[node name="EvolutionTimer" type="Timer" parent="."]
-wait_time = 0.1
-
 [node name="HUD" parent="." instance=ExtResource("7_o6xl0")]
 
-[connection signal="timeout" from="EvolutionTimer" to="." method="_on_evolution_timer_timeout"]
 [connection signal="change_speed" from="HUD" to="." method="_on_hud_change_speed"]
 [connection signal="clear" from="HUD" to="." method="_on_hud_clear"]
 [connection signal="pause" from="HUD" to="." method="_on_hud_pause"]

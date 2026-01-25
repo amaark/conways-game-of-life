@@ -1,6 +1,5 @@
 extends Node2D
 
-@onready var evolution_timer: Timer = $EvolutionTimer
 @onready var grid: TileMapLayer = $Grid
 
 var live_cells: Dictionary[Vector2i, int] = {
@@ -26,9 +25,22 @@ var prev_mouse_pos
 
 var painting_mode: bool
 
+const WAIT_TIME_BASE := 0.1
+var wait_time := WAIT_TIME_BASE
+var time_elapsed := 0.0
+
+var paused := true
+
 func _ready() -> void:
 	for coords in live_cells:
 		grid.set_cell_state(coords, true)
+
+func _physics_process(delta: float) -> void:
+	if not paused:
+		time_elapsed += delta
+		if time_elapsed >= wait_time:
+			evolve()
+			time_elapsed = 0.0
 	
 func _unhandled_input(event: InputEvent) -> void:
 	if Input.is_action_pressed("paint_cell"):
@@ -39,12 +51,13 @@ func _unhandled_input(event: InputEvent) -> void:
 func click() -> void:
 	if Input.is_action_just_pressed("paint_cell"):
 		painting_mode = not grid.local_to_map(get_global_mouse_position()) in live_cells
-		
+	
 	var coords := grid.local_to_map(get_global_mouse_position())
+	
 	# Debounce
 	if coords == prev_mouse_pos:
 		return
-		
+	
 	prev_mouse_pos = coords
 	grid.set_cell_state(coords, painting_mode)
 	
@@ -52,15 +65,6 @@ func click() -> void:
 		live_cells[coords] = 0
 	else:
 		live_cells.erase(coords)
-
-func _on_evolution_timer_timeout() -> void:
-	evolve()
-
-func _on_hud_play() -> void:
-	evolution_timer.start()
-
-func _on_hud_pause() -> void:
-	evolution_timer.stop()
 
 ## Flips live cells and their neighbours according to the game rules
 func evolve() -> void:
@@ -96,8 +100,15 @@ func evolve() -> void:
 		grid.set_cell_state(coords, false)
 		live_cells.erase(coords)
 
+func _on_hud_play() -> void:
+	paused = false
+
+func _on_hud_pause() -> void:
+	paused = true
+	time_elapsed = 0.0
+
 func _on_hud_change_speed(new_value: float) -> void:
-	evolution_timer.wait_time = 0.1 / new_value
+	wait_time = WAIT_TIME_BASE / new_value
 
 func _on_hud_clear() -> void:
 	for cell in live_cells:
