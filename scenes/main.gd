@@ -2,12 +2,12 @@ extends Node2D
 
 @onready var grid: TileMapLayer = $Grid
 
-var live_cells: Dictionary[Vector2i, int] = {
-	Vector2i(18, 10): 0,
-	Vector2i(19, 10): 0,
-	Vector2i(20, 10): 0,
-	Vector2i(20, 9): 0,
-	Vector2i(19, 8): 0
+var live_cells: Dictionary[Vector2i, bool] = {
+	Vector2i(18, 10): true,
+	Vector2i(19, 10): true,
+	Vector2i(20, 10): true,
+	Vector2i(20, 9): true,
+	Vector2i(19, 8): true
 	}
 
 var neighbours := [
@@ -62,7 +62,7 @@ func click() -> void:
 	grid.set_cell_state(coords, painting_mode)
 	
 	if painting_mode:
-		live_cells[coords] = 0
+		live_cells[coords] = true
 	else:
 		live_cells.erase(coords)
 
@@ -88,17 +88,11 @@ func evolve() -> void:
 	# Check each live cell and adjacent cell against the 4 cell rules
 	for coords in num_neighbours:
 		if (num_neighbours[coords] < 2 or num_neighbours[coords] > 3) and coords in live_cells:
-			to_die.append(coords)
+			grid.set_cell_state(coords, false)
+			live_cells.erase(coords)
 		elif num_neighbours[coords] == 3 and not coords in live_cells:
-			to_live.append(coords)
-	
-	for coords in to_live:
-		grid.set_cell_state(coords, true)
-		live_cells[coords] = 0
-	
-	for coords in to_die:
-		grid.set_cell_state(coords, false)
-		live_cells.erase(coords)
+			grid.set_cell_state(coords, true)
+			live_cells[coords] = true
 
 func _on_hud_play() -> void:
 	paused = false
