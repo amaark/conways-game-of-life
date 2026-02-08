@@ -62,11 +62,9 @@ func click() -> void:
 	if curr_mouse_pos == prev_mouse_pos:
 		return
 
-	# Fill in gaps between this frame and the previous with linear interpolation
+	# Fill in gaps between this frame and the previous with Bresenham's line algorithm
 	if prev_mouse_pos != null:
-		var distance: Vector2i = curr_mouse_pos - prev_mouse_pos
-		for i in distance.length():
-			var cell := Vector2i(Vector2(curr_mouse_pos).lerp(prev_mouse_pos, i / distance.length()))
+		for cell in get_line(prev_mouse_pos, curr_mouse_pos):
 			grid.set_cell_state(cell, painting_mode)
 			if painting_mode:
 				live_cells[cell] = true
@@ -79,6 +77,72 @@ func click() -> void:
 		live_cells[curr_mouse_pos] = true
 	else:
 		live_cells.erase(curr_mouse_pos)
+
+
+# Implementation from Wikipedia lol
+func get_line(a: Vector2i, b: Vector2i) -> Array[Vector2i]:
+	var cells: Array[Vector2i]
+
+	if abs(b.y - a.y) < abs(b.x - a.x):
+		if a.x > b.x:
+			cells = get_line_low(b, a)
+		else:
+			cells = get_line_low(a, b)
+	else:
+		if a.y > b.y:
+			cells = get_line_high(b, a)
+		else:
+			cells = get_line_high(a, b)
+
+	return cells
+
+
+func get_line_high(a: Vector2i, b: Vector2i) -> Array[Vector2i]:
+	var cells: Array[Vector2i]
+	var dx = b.x - a.x
+	var dy = b.y - a.y
+	var xi = 1
+
+	if dx < 0:
+		xi = -1
+		dx = -dx
+
+	var diff = (2 * dx) - dy
+	var x = a.x
+
+	for y in range(a.y, b.y):
+		cells.append(Vector2i(x, y))
+		if diff > 0:
+			x = x + xi
+			diff += 2 * (dx - dy)
+		else:
+			diff += 2 * dx
+
+	return cells
+
+
+func get_line_low(a: Vector2i, b: Vector2i) -> Array[Vector2i]:
+	var cells: Array[Vector2i]
+	var dx = b.x - a.x
+	var dy = b.y - a.y
+	var yi = 1
+
+	if dy < 0:
+		yi = -1
+		dy = -dy
+
+	var diff = (2 * dy) - dx
+	var y = a.y
+
+	for x in range(a.x, b.x):
+		cells.append(Vector2i(x, y))
+		if diff > 0:
+			y = y + yi
+			diff += 2 * (dy - dx)
+		else:
+			diff += 2 * dy
+
+	return cells
 
 
 ## Flips live cells and their neighbours according to the game rules
