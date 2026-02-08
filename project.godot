@@ -20,6 +20,10 @@ config/icon="res://icon.svg"
 window/stretch/mode="viewport"
 window/stretch/aspect="expand"
 
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/gdscript-formatter/godot-addon/addons/GDQuest_GDScript_formatter/plugin.cfg")
+
 [input]
 
 camera_move_up={
